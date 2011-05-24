@@ -31,12 +31,8 @@ class syntax_plugin_seealso extends DokuWiki_Syntax_Plugin {
 
     public function connectTo($mode) {
         $this->Lexer->addSpecialPattern('\{\{see_also.*?\}\}',$mode,'plugin_seealso');
-//        $this->Lexer->addEntryPattern('<FIXME>',$mode,'plugin_seealso');
     }
 
-//    public function postConnect() {
-//        $this->Lexer->addExitPattern('</FIXME>','plugin_seealso');
-//    }
 
     public function handle($match, $state, $pos, &$handler){
         global $ID;
@@ -76,13 +72,18 @@ class syntax_plugin_seealso extends DokuWiki_Syntax_Plugin {
             $tag='';
         }#
 
-        if ($my =& plugin_load('helper', 'tag')) $pagesx = $my->getTopic($ns, '', $tag);
+        if (plugin_isdisabled('tag') || (!$my =& plugin_load('helper', 'tag'))) {
+            msg($this->getLang('missing_tagplugin'), -1);
+            return false;
+        } else {
+            $pagesx = $my->getTopic($ns, '', $tag);
+        }
         foreach ($pagesx as $page) {
             if ($page['id'] != $ID) { // strips the current page from the array
                 $pages[]=$page;
             }
         }
-       // if (!$pages) return true; // nothing to display
+        if (!$pages) return true; // nothing to display
 
         if ($mode == 'xhtml') {
 
@@ -99,12 +100,13 @@ class syntax_plugin_seealso extends DokuWiki_Syntax_Plugin {
             foreach ($pages as $page) {
                 $pagelist->addPage($page);
             }
-            $title = $this->getLang('tag_see_also');
+            $title = $this->getLang('topic_see_also');
+
             $hid = $this->_addToTOC($title, 2, $renderer);
 
             $renderer->doc .= '<div class="see_also">'.DOKU_LF;
             $renderer->doc .= DOKU_TAB.'<h2 >'.DOKU_LF;
-            $renderer->doc .= DOKU_TAB.DOKU_TAB.'<a id="'.$hid.'" name="'.$hid.'">'.$this->getLang('tag_see_also').'</a>'.DOKU_LF;
+            $renderer->doc .= DOKU_TAB.DOKU_TAB.'<a id="'.$hid.'" name="'.$hid.'">'.$this->getLang('topic_see_also').'</a>'.DOKU_LF;
             $renderer->doc .= DOKU_TAB.'</h2>'.DOKU_LF;
             $renderer->doc .= $pagelist->finishList();
             $renderer->doc .= '</div>'.DOKU_LF;
