@@ -1,0 +1,7 @@
+base   seealso
+author Sebastian Stigler
+email  rattakresch@vorsicht-bissig.de
+date   2011-05-20
+name   seealso plugin
+desc   Displays all related wiki pages due to the tags used at the current pag
+url    http://www.dokuwiki.org/plugin:seealso
